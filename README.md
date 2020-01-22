@@ -26,6 +26,12 @@ npm ci
 npm start
 ```
 
+### To format code
+
+```
+npm run format
+```
+
 ## Contributing
 
 To contributing please refer to the [CONTRIBUTING.MD](CONTRIBUTING.MD)
