@@ -28,8 +28,8 @@ npm start
 
 ## Contributing
 
-To do
+To contributing please refer to the [CONTRIBUTING.MD](CONTRIBUTING.MD)
 
-## Licence
+## License
 
-To do
+[LICENSE MIT](LICENSE)
