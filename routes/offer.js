@@ -1,30 +1,38 @@
 const express = require("express");
 const Offer = require("../models/Offers");
+const User = require("../models/User");
+const isAuthenticated = require("../middleware/isAuthenticated");
 
 const router = express.Router();
 
 // Post Offer:
-router.post("/offer/publish", async (req, res) => {
+router.post("/offer/publish", isAuthenticated, async (req, res) => {
   try {
-    // Récupérer le token
-    // trouver l'utilisateur à partir de son token
-    user;
-
     const newOffer = new Offer({
       title: req.fields.title,
       description: req.fields.description,
       price: req.fields.price,
       created: new Date(),
-      creator: user
+      creator: req.user
     });
 
     await newOffer.save();
 
     return res.json({
-      ...newOffer
+      _id: newOffer._id,
+      title: req.fields.title,
+      description: req.fields.description,
+      price: req.fields.price,
+      created: newOffer.created,
+      creator: {
+        account: {
+          username: newOffer.creator.account.username
+        },
+        _id: newOffer.creator._id
+      }
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 });
 

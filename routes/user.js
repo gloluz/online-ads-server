@@ -33,7 +33,7 @@ router.post("/user/sign_up", async (req, res) => {
       if (!alreadyExistingEmail) {
         await user.save();
 
-        res.json({
+        return res.json({
           _id: user._id,
           token: user.token,
           account: {
@@ -42,13 +42,13 @@ router.post("/user/sign_up", async (req, res) => {
           }
         });
       } else {
-        res.status(400).json({ message: "Already existing email" });
+        return res.status(400).json({ message: "Already existing email" });
       }
     } else {
-      res.status(400).json({ message: "Missing parameter(s)" });
+      return res.status(400).json({ message: "Missing parameter(s)" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 });
 
@@ -63,19 +63,19 @@ router.post("/user/log_in", async (req, res) => {
           encBase64
         ) === userLogInEmail.hash
       ) {
-        res.json({
+        return res.json({
           _id: userLogInEmail._id,
           token: userLogInEmail.token,
           account: userLogInEmail.account
         });
       } else {
-        res.status(400).json({ message: "Unauthorized" });
+        return res.status(400).json({ message: "Unauthorized" });
       }
     } else {
-      res.status(400).json({ message: "User not found" });
+      return res.status(400).json({ message: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 });
 
