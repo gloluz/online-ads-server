@@ -1,14 +1,14 @@
-const express = require("express");
-const uid2 = require("uid2");
-const SHA256 = require("crypto-js/sha256");
-const encBase64 = require("crypto-js/enc-base64");
+const express = require('express');
+const uid2 = require('uid2');
+const SHA256 = require('crypto-js/sha256');
+const encBase64 = require('crypto-js/enc-base64');
 
-const User = require("../models/User");
+const User = require('../models/User');
 
 const router = express.Router();
 
 //Create Sign Up:
-router.post("/user/sign_up", async (req, res) => {
+router.post('/user/sign_up', async (req, res) => {
   try {
     const token = uid2(64);
     const salt = uid2(64);
@@ -21,12 +21,12 @@ router.post("/user/sign_up", async (req, res) => {
       email: req.fields.email,
       account: {
         username: req.fields.username,
-        phone: req.fields.phone
-      }
+        phone: req.fields.phone,
+      },
     });
 
     const alreadyExistingEmail = await User.findOne({
-      email: req.fields.email
+      email: req.fields.email,
     });
 
     if (req.fields.username && req.fields.email && req.fields.password) {
@@ -38,14 +38,14 @@ router.post("/user/sign_up", async (req, res) => {
           token: user.token,
           account: {
             username: user.account.username,
-            phone: user.account.phone
-          }
+            phone: user.account.phone,
+          },
         });
       } else {
-        return res.status(400).json({ message: "Already existing email" });
+        return res.status(400).json({ message: 'Already existing email' });
       }
     } else {
-      return res.status(400).json({ message: "Missing parameter(s)" });
+      return res.status(400).json({ message: 'Missing parameter(s)' });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -53,26 +53,22 @@ router.post("/user/sign_up", async (req, res) => {
 });
 
 // Log In:
-router.post("/user/log_in", async (req, res) => {
+router.post('/user/log_in', async (req, res) => {
   try {
     const userLogInEmail = await User.findOne({ email: req.fields.email });
 
     if (userLogInEmail) {
-      if (
-        SHA256(req.fields.password + userLogInEmail.salt).toString(
-          encBase64
-        ) === userLogInEmail.hash
-      ) {
+      if (SHA256(req.fields.password + userLogInEmail.salt).toString(encBase64) === userLogInEmail.hash) {
         return res.json({
           _id: userLogInEmail._id,
           token: userLogInEmail.token,
-          account: userLogInEmail.account
+          account: userLogInEmail.account,
         });
       } else {
-        return res.status(400).json({ message: "Unauthorized" });
+        return res.status(400).json({ message: 'Unauthorized' });
       }
     } else {
-      return res.status(400).json({ message: "User not found" });
+      return res.status(400).json({ message: 'User not found' });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });
