@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const formidableMiddleware = require('express-formidable');
 const mongoose = require('mongoose');
@@ -8,10 +9,18 @@ const offer = require('./routes/offer');
 const app = express();
 app.use(formidableMiddleware());
 
-mongoose.connect('mongodb://localhost/LeBonCoin', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
+});
+
+app.get('/', async (req, res) => {
+  try {
+    return res.json({ message: 'Welcome to the online ads API' });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 });
 
 app.use(user);

@@ -2,6 +2,7 @@ const express = require('express');
 const Offer = require('../models/Offers');
 const User = require('../models/User');
 const isAuthenticated = require('../middleware/isAuthenticated');
+const createFilter = require('../middleware/createFilters');
 
 const router = express.Router();
 
@@ -12,7 +13,6 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
       title: req.fields.title,
       description: req.fields.description,
       price: req.fields.price,
-      created: new Date(),
       creator: req.user,
     });
 
@@ -25,12 +25,79 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
       price: req.fields.price,
       created: newOffer.created,
       creator: {
-        account: {
-          username: newOffer.creator.account.username,
-        },
+        account: newOffer.creator.account,
         _id: newOffer.creator._id,
       },
     });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+// Fonction:
+const createFilters = req => {
+  const filters = {};
+
+  if (req.query.priceMin) {
+    filters.price = {};
+    filters.price.$gte = req.query.priceMin;
+  }
+
+  if (req.query.priceMax) {
+    if (filters.price === undefined) {
+      filters.price = {};
+    }
+    filters.price.$lte = req.query.priceMax;
+  }
+
+  if (req.query.title) {
+    filters.title = new RegExp(req.query.title, 'i');
+  }
+
+  return filters;
+};
+
+// Read:
+router.get('/offer/with-count', async (req, res) => {
+  try {
+    const filters = createFilters(req);
+    const search = Offer.find(filters).populate({ path: 'creator', select: 'account' });
+
+    if (req.query.sort === 'price-asc') {
+      search.sort({ price: 1 });
+    } else if (req.query.sort === 'price-desc') {
+      search.sort({ price: -1 });
+    }
+
+    if (req.query.sort === 'date-asc') {
+      search.sort({ date: 1 });
+    } else if (req.query.sort === 'date-desc') {
+      search.sort({ date: -1 });
+    }
+
+    if (req.query.page) {
+      const page = req.query.page;
+      const limit = 4;
+
+      search.limit(limit).skip(limit * (page - 1));
+    }
+    const offers = await search;
+
+    return res.json({
+      count: offers.length,
+      offers: offers,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+// Read by Id:
+router.get('/offer/:id', async (req, res) => {
+  try {
+    const offers = await Offer.findById(req.params.id);
+
+    return res.json(offers);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

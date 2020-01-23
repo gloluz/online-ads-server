@@ -23,7 +23,7 @@ npm ci
 ### Start the server
 
 ```
-npm start
+npm run dev
 ```
 
 ### To format code
