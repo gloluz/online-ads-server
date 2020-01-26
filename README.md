@@ -22,6 +22,14 @@ npm ci
 
 ### Start the server
 
+#### In prod mode
+
+```
+npm start
+```
+
+#### In dev mode
+
 ```
 npm run dev
 ```

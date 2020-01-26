@@ -2,7 +2,7 @@ const express = require('express');
 const Offer = require('../models/Offers');
 const User = require('../models/User');
 const isAuthenticated = require('../middleware/isAuthenticated');
-const createFilter = require('../middleware/createFilters');
+const createFilters = require('../services/createOfferFilters');
 
 const router = express.Router();
 
@@ -33,29 +33,6 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 });
-
-// Fonction:
-const createFilters = req => {
-  const filters = {};
-
-  if (req.query.priceMin) {
-    filters.price = {};
-    filters.price.$gte = req.query.priceMin;
-  }
-
-  if (req.query.priceMax) {
-    if (filters.price === undefined) {
-      filters.price = {};
-    }
-    filters.price.$lte = req.query.priceMax;
-  }
-
-  if (req.query.title) {
-    filters.title = new RegExp(req.query.title, 'i');
-  }
-
-  return filters;
-};
 
 // Read:
 router.get('/offer/with-count', async (req, res) => {
