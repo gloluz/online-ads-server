@@ -1,4 +1,3 @@
-const dotenv = require('dotenv');
 const express = require('express');
 const cors = require('cors');
 const formidableMiddleware = require('express-formidable');
@@ -11,9 +10,7 @@ const app = express();
 app.use(formidableMiddleware());
 app.use(cors());
 
-const config = dotenv.config().parsed;
-
-mongoose.connect(config.MONGODB_URI, {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
@@ -35,6 +32,6 @@ app.all('*', (req, res) => {
   res.json({ message: 'Page not found' });
 });
 
-app.listen(config.PORT, () => {
+app.listen(process.env.PORT, () => {
   console.log('Server Started');
 });
