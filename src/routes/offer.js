@@ -28,30 +28,30 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
       picture: req.files.picture,
     });
 
-    cloudinary.uploader.upload(req.files.picture.path, function(result, error) {
+    cloudinary.uploader.upload(req.files.picture.path, async (result, error) => {
       // console.log('result :', error);
       // res.json({
       //   url: result.secure_url,
       // });
-    });
 
-    req.user.account.nbOffers = req.user.account.nbOffers + 1;
-    req.user.save();
+      req.user.account.nbOffers = req.user.account.nbOffers + 1;
+      req.user.save();
 
-    await newOffer.save();
-    url.save();
+      await newOffer.save();
+      url.save();
 
-    return res.json({
-      _id: newOffer._id,
-      title: req.fields.title,
-      description: req.fields.description,
-      price: req.fields.price,
-      created: newOffer.created,
-      creator: {
-        account: newOffer.creator.account,
-        _id: newOffer.creator._id,
-      },
-      picture: req.files.url,
+      return res.json({
+        _id: newOffer._id,
+        title: req.fields.title,
+        description: req.fields.description,
+        price: req.fields.price,
+        created: newOffer.created,
+        creator: {
+          account: newOffer.creator.account,
+          _id: newOffer.creator._id,
+        },
+        picture: req.files.url,
+      });
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
