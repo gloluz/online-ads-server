@@ -30,10 +30,9 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
 
     cloudinary.uploader.upload(req.files.picture.path, function(result, error) {
       // console.log('result :', error);
-
-      res.json({
-        url: result.secure_url,
-      });
+      // res.json({
+      //   url: result.secure_url,
+      // });
     });
 
     req.user.account.nbOffers = req.user.account.nbOffers + 1;
