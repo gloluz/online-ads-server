@@ -29,7 +29,7 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
     });
 
     console.log(req.files.picture.path);
-    cloudinary.uploader.upload(req.files.picture.path, function(result, error) {
+    cloudinary.uploader.upload(req.files.picture.path, async (result, error) => {
       console.log('result :', error);
       // res.json({
       //   url: result.secure_url,
