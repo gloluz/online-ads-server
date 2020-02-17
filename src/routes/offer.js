@@ -23,9 +23,6 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
     console.log(req.files.picture.path);
     cloudinary.uploader.upload(req.files.picture.path, async (result, error) => {
       console.log('result :', error);
-      // res.json({
-      //   url: result.secure_url,
-      // });
 
       req.user.account.nbOffers = req.user.account.nbOffers + 1;
       await req.user.save();
@@ -38,7 +35,6 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
       });
 
       await newOffer.save();
-      // url.save();
 
       return res.json({
         _id: newOffer._id,
@@ -50,7 +46,7 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
           account: newOffer.creator.account,
           _id: newOffer.creator._id,
         },
-        picture: [result.secure_url],
+        picture: result.secure_url,
       });
     });
   } catch (error) {

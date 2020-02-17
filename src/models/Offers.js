@@ -14,7 +14,7 @@ const Offer = mongoose.model('Offer', {
     require: true,
   },
   picture: {
-    type: String,
+    type: [String],
   },
   price: {
     type: Number,
