@@ -50,7 +50,7 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
           account: newOffer.creator.account,
           _id: newOffer.creator._id,
         },
-        picture: result.secure_url,
+        picture: [result.secure_url],
       });
     });
   } catch (error) {
