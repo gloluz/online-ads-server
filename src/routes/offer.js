@@ -34,7 +34,7 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
         description: req.fields.description,
         price: req.fields.price,
         creator: req.user,
-        picture: req.result.secure_url,
+        picture: result.secure_url,
       });
 
       // await newOffer.save();
