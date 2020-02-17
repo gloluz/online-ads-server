@@ -37,7 +37,7 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
         picture: result.secure_url,
       });
 
-      // await newOffer.save();
+      await newOffer.save();
       // url.save();
 
       return res.json({
