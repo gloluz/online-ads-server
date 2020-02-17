@@ -4,10 +4,12 @@ const isAuthenticated = require('../middleware/isAuthenticated');
 const createFilters = require('../services/createOfferFilters');
 const formidableMiddleware = require('express-formidable');
 const cloudinary = require('cloudinary');
+const cors = require('cors');
 
 const router = express.Router();
 const server = express();
 server.use(formidableMiddleware());
+// app.use(cors());
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -26,8 +28,8 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
       picture: req.files.picture,
     });
 
-    cloudinary.uploader.upload(req.files.picture.path, function(error, result) {
-      console.log('result :', result);
+    cloudinary.uploader.upload(req.files.picture.path, function(result, error) {
+      // console.log('result :', error);
 
       res.json({
         url: result.secure_url,
@@ -38,6 +40,7 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
     req.user.save();
 
     await newOffer.save();
+    url.save();
 
     return res.json({
       _id: newOffer._id,
@@ -49,11 +52,9 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
         account: newOffer.creator.account,
         _id: newOffer.creator._id,
       },
-      picture: req.files.picture,
+      picture: req.files.url,
     });
   } catch (error) {
-    console.log('4');
-
     return res.status(500).json({ message: error.message });
   }
 });
