@@ -22,6 +22,7 @@ router.post('/user/sign_up', async (req, res) => {
       account: {
         username: req.fields.username,
         phone: req.fields.phone,
+        nbOffers: 0,
       },
     });
 
@@ -39,6 +40,7 @@ router.post('/user/sign_up', async (req, res) => {
           account: {
             username: user.account.username,
             phone: user.account.phone,
+            nbOffers: user.account.nbOffers,
           },
         });
       } else {

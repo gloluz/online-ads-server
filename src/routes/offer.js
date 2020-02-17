@@ -1,6 +1,5 @@
 const express = require('express');
 const Offer = require('../models/Offers');
-const User = require('../models/User');
 const isAuthenticated = require('../middleware/isAuthenticated');
 const createFilters = require('../services/createOfferFilters');
 
@@ -15,6 +14,9 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
       price: req.fields.price,
       creator: req.user,
     });
+
+    req.user.account.nbOffers = req.user.account.nbOffers + 1;
+    req.user.save();
 
     await newOffer.save();
 
@@ -72,7 +74,7 @@ router.get('/offer/with-count', async (req, res) => {
 // Read by Id:
 router.get('/offer/:id', async (req, res) => {
   try {
-    const offers = await Offer.findById(req.params.id);
+    const offers = await Offer.findById(req.params.id).populate({ path: 'creator', select: 'account' });
 
     return res.json(offers);
   } catch (error) {
