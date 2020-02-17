@@ -2,8 +2,18 @@ const express = require('express');
 const Offer = require('../models/Offers');
 const isAuthenticated = require('../middleware/isAuthenticated');
 const createFilters = require('../services/createOfferFilters');
+const formidableMiddleware = require('express-formidable');
+const cloudinary = require('cloudinary');
 
 const router = express.Router();
+const server = express();
+server.use(formidableMiddleware());
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 
 // Post Offer:
 router.post('/offer/publish', isAuthenticated, async (req, res) => {
@@ -13,6 +23,15 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
       description: req.fields.description,
       price: req.fields.price,
       creator: req.user,
+      picture: req.files.picture,
+    });
+
+    cloudinary.uploader.upload(req.files.picture.path, function(error, result) {
+      console.log('result :', result);
+
+      res.json({
+        url: result.secure_url,
+      });
     });
 
     req.user.account.nbOffers = req.user.account.nbOffers + 1;
@@ -30,8 +49,11 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
         account: newOffer.creator.account,
         _id: newOffer.creator._id,
       },
+      picture: req.files.picture,
     });
   } catch (error) {
+    console.log('4');
+
     return res.status(500).json({ message: error.message });
   }
 });
