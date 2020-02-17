@@ -39,7 +39,7 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
       req.user.save();
 
       // await newOffer.save();
-      url.save();
+      // url.save();
 
       return res.json({
         _id: newOffer._id,
@@ -55,6 +55,7 @@ router.post('/offer/publish', isAuthenticated, async (req, res) => {
       });
     });
   } catch (error) {
+    console.log(error.message);
     return res.status(500).json({ message: error.message });
   }
 });
