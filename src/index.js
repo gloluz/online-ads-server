@@ -29,6 +29,8 @@ app.use(user);
 
 app.use(offer);
 
+app.use(pay);
+
 app.all('*', (req, res) => {
   res.json({ message: 'Page not found' });
 });

@@ -13,7 +13,7 @@ const Offer = mongoose.model('Offer', {
     maxLength: [500, 'Please enter less than 500 characters'],
     require: true,
   },
-  picture: {
+  pictures: {
     type: [String],
   },
   price: {

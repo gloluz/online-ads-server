@@ -4,12 +4,10 @@ const isAuthenticated = require('../middleware/isAuthenticated');
 const createFilters = require('../services/createOfferFilters');
 const formidableMiddleware = require('express-formidable');
 const cloudinary = require('cloudinary');
-const cors = require('cors');
 
 const router = express.Router();
 const server = express();
 server.use(formidableMiddleware());
-// app.use(cors());
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -20,35 +18,51 @@ cloudinary.config({
 // Post Offer:
 router.post('/offer/publish', isAuthenticated, async (req, res) => {
   try {
-    console.log(req.files.picture.path);
-    cloudinary.uploader.upload(req.files.picture.path, async (result, error) => {
-      console.log('result :', error);
+    const files = Object.keys(req.files);
 
-      req.user.account.nbOffers = req.user.account.nbOffers + 1;
-      await req.user.save();
-      const newOffer = new Offer({
-        title: req.fields.title,
-        description: req.fields.description,
-        price: req.fields.price,
-        creator: req.user,
-        picture: result.secure_url,
+    if (files.length) {
+      const pictures = [];
+
+      files.forEach(key => {
+        cloudinary.uploader.upload(req.files[key].path, async (result, error) => {
+          if (!error) {
+            pictures.push(result.secure_url);
+          } else {
+            return res.status(500).json({ message: "Erreur dans l'import des fichiers" });
+          }
+
+          if (pictures.length === files.length) {
+            // tous les uploads sont terminés, on peut donc envoyer la réponse au client
+
+            req.user.account.nbOffers = req.user.account.nbOffers + 1;
+            await req.user.save();
+
+            const newOffer = new Offer({
+              title: req.fields.title,
+              description: req.fields.description,
+              price: req.fields.price,
+              creator: req.user,
+              pictures,
+            });
+
+            await newOffer.save();
+
+            return res.json({
+              _id: newOffer._id,
+              title: req.fields.title,
+              description: req.fields.description,
+              price: req.fields.price,
+              created: newOffer.created,
+              creator: {
+                account: newOffer.creator.account,
+                _id: newOffer.creator._id,
+              },
+              pictures,
+            });
+          }
+        });
       });
-
-      await newOffer.save();
-
-      return res.json({
-        _id: newOffer._id,
-        title: req.fields.title,
-        description: req.fields.description,
-        price: req.fields.price,
-        created: newOffer.created,
-        creator: {
-          account: newOffer.creator.account,
-          _id: newOffer.creator._id,
-        },
-        picture: result.secure_url,
-      });
-    });
+    }
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ message: error.message });
@@ -80,6 +94,8 @@ router.get('/offer/with-count', async (req, res) => {
       search.limit(limit).skip(limit * (page - 1));
     }
     const offers = await search;
+
+    console.log('offers', offers);
 
     return res.json({
       count: offers.length,
