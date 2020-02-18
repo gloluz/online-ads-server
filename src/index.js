@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 
 const user = require('./routes/user');
 const offer = require('./routes/offer');
+const payment = require('./routes/payment');
 
 const app = express();
 app.use(formidableMiddleware());
@@ -29,7 +30,7 @@ app.use(user);
 
 app.use(offer);
 
-app.use(pay);
+app.use(payment);
 
 app.all('*', (req, res) => {
   res.json({ message: 'Page not found' });

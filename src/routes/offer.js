@@ -95,8 +95,6 @@ router.get('/offer/with-count', async (req, res) => {
     }
     const offers = await search;
 
-    console.log('offers', offers);
-
     return res.json({
       count: offers.length,
       offers: offers,
